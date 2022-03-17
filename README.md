@@ -32,6 +32,7 @@ fixed esp and aimbot enhanced
 \
 press end or close the game to unload the cheat
 
+Run the cheat with administrator
 
 Tiny Man#0200
 \
