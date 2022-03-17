@@ -243,8 +243,8 @@ inline namespace Configuration
 		int UnloadKey = 0;
 		int CloseGameKey = 25;
 		float fakehealth = 900.0f;
-		float Smoothing = 0.500f;
-		float AimbotFOV = 300.0f;
+		float Smoothing = 5.0f;
+		float AimbotFOV = 600.0f;
 		float max_distance = 10000.0f;
 		int ScreenWidth = GetSystemMetrics(SM_CXSCREEN) / 2;
 		int ScreenHeight = GetSystemMetrics(SM_CYSCREEN) / 2;
