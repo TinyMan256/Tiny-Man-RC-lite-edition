@@ -22,6 +22,8 @@ weapon type: auto
 \
 fast reload
 \
+reload type: clip
+\
 fast bullets
 \
 unlimited ammo
