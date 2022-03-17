@@ -24,6 +24,8 @@ fast reload
 \
 fast bullets
 \
+unlimited ammo
+\
 fixed esp and aimbot enhanced
 \
 press end or close the game to unload the cheat
