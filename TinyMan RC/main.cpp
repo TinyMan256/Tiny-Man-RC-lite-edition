@@ -218,7 +218,6 @@ auto RenderVisual()->VOID
 		auto Health = read<float>(Entity.actor_pawn + GameOffset.offset_health);
 		auto MaxHealth = read<float>(Entity.actor_pawn + GameOffset.offset_max_health);
 		auto Percentage = Health * 100 / MaxHealth;
-	//	if (Entity.actor_pawn == GameVars.local_player_pawn){continue;}
 			if (Percentage == 0 || !Entity.actor_mesh || !Entity.actor_state || !Entity.actor_pawn)
 			{
 				continue;
