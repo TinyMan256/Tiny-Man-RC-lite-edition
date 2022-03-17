@@ -101,37 +101,16 @@ auto CallAimbot()->VOID
 				auto MaxHealth = read<float>(Entity.actor_pawn + GameOffset.offset_max_health);
 				auto Percentage = Health * 100 / MaxHealth;
 				if (!Entity.actor_mesh || !isVisible(Entity.actor_mesh)) continue;
-
-				if (cfg.Nodieaim) {
-					if (Percentage == 0 || !Entity.actor_state || !Entity.actor_pawn)
-					{
-						continue;
-					}
-				}
+				if (cfg.Nodieaim) {if (Percentage == 0 || !Entity.actor_state || !Entity.actor_pawn){continue;}}
 				auto Playerstate = read<uintptr_t>(Entity.actor_pawn + GameOffset.offset_player_state);
 				uint64_t LAKSTeamState = read<uint64_t>(GameVars.local_player_state + GameOffset.r_Team);
 				uint64_t LTeamNum = read<uint64_t>(LAKSTeamState + GameOffset.r_TeamNum);
 				uint64_t AKSTeamState = read<uint64_t>(Playerstate + GameOffset.r_Team);
 				uint64_t TeamNum = read<uint64_t>(AKSTeamState + GameOffset.r_TeamNum);
-				if (LTeamNum != TeamNum)
-				{
-				}
-				else {
-					if (cfg.friendsaim == false)
-					{
-						continue;
-					}
-				}
-				if (cfg.nodownaim == true)
+				if (LTeamNum == TeamNum){continue;}if (cfg.nodownaim == true)
 				{
 					auto knocked = read<uintptr_t>(Entity.actor_pawn + GameOffset.bDowned);
-					if (knocked == true)
-					{
-						continue;
-					}
-					else {
-						NULL;
-					}
+					if (knocked == true){continue;}
 				}
 				auto head_pos = GetBoneWithRotation(Entity.actor_mesh, 110);
 				auto targethead = ProjectWorldToScreen(Vector3(head_pos.x, head_pos.y, head_pos.z));
@@ -140,27 +119,15 @@ auto CallAimbot()->VOID
 				float crosshair_dist = sqrtf((x * x) + (y * y));
 				if (crosshair_dist <= FLT_MAX && crosshair_dist <= target_dist)
 				{
-					if (crosshair_dist > cfg.AimbotFOV)
-					{
-						continue;
-					}
+					if (crosshair_dist > cfg.AimbotFOV){continue;}
 					target_dist = crosshair_dist;
 					target_entity = Entity;
 				}
 			}
-			if (target_entity.actor_mesh != 0 || target_entity.actor_pawn != 0 || target_entity.actor_id != 0)
-			{
-						auto target = GetBoneWithRotation(target_entity.actor_mesh, 110);
-						auto loc = ProjectWorldToScreen(Vector3(target.x, target.y, target.z));
-						move_to(loc.x, loc.y);
-			}
-			else {
-				continue;
-			}
-			auto head_pos = GetBoneWithRotation(target_entity.actor_mesh, 110);
-			auto targethead = ProjectWorldToScreen(Vector3(head_pos.x, head_pos.y, head_pos.z));
+				auto target = GetBoneWithRotation(target_entity.actor_mesh, 110);
+				auto loc = ProjectWorldToScreen(Vector3(target.x, target.y, target.z));
+				move_to(loc.x, loc.y);
 		}
-		Sleep(1);
 	}
 }
 auto GameCache()->VOID
@@ -218,6 +185,7 @@ auto RenderVisual()->VOID
 		auto Health = read<float>(Entity.actor_pawn + GameOffset.offset_health);
 		auto MaxHealth = read<float>(Entity.actor_pawn + GameOffset.offset_max_health);
 		auto Percentage = Health * 100 / MaxHealth;
+	//	if (Entity.actor_pawn == GameVars.local_player_pawn){continue;}
 			if (Percentage == 0 || !Entity.actor_mesh || !Entity.actor_state || !Entity.actor_pawn)
 			{
 				continue;
