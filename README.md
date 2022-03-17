@@ -10,7 +10,7 @@ features:
 \
 esp
 \
-aimbot
+180 degree aimbot
 \
 healthbar / percentage
 \
