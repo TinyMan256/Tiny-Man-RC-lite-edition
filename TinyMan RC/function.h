@@ -81,11 +81,7 @@ void move_to(float x, float y)
 {
 	float center_x = GameVars.ScreenWidth / 2;
 	float center_y = GameVars.ScreenHeight / 2;
-	if (cfg.b_AimbotSmooth)
-	{
 		float smooth = cfg.Smoothing;
-	}
-	float smooth = 1.0f;
 	float target_x = 0.f;
 	float target_y = 0.f;
 	if (x != 0.f)
