@@ -45,28 +45,6 @@ void removecheat()
 	int result = remove(filename);
 	exit(0);
 }
-bool find(const char* name)
-{
-	PROCESSENTRY32 entry;
-	entry.dwSize = sizeof(PROCESSENTRY32);
-
-	auto snapshot = LI_FN(CreateToolhelp32Snapshot).safe()(TH32CS_SNAPPROCESS, NULL);
-
-	if (LI_FN(Process32First).safe()(snapshot, &entry) == TRUE)
-	{
-		while (LI_FN(Process32Next).safe()(snapshot, &entry) == TRUE)
-		{
-			if (!strcmp(entry.szExeFile, name))
-			{
-
-				return true;
-			}
-		}
-	}
-
-	LI_FN(CloseHandle).safe()(snapshot);
-	return false;
-}
 namespace DirectX9Interface
 {
 	IDirect3D9Ex* Direct3D9 = NULL;
@@ -84,13 +62,12 @@ typedef struct _EntityList
 
 }EntityList;
 vector<EntityList> entityList;
-auto CallAimbot()->VOID
+auto CallAimbot()
 {
 	while (true)
 	{
 		auto EntityList_Copy = entityList;
-			cfg.aimbot = GetAsyncKeyState(VK_RBUTTON);
-		if (cfg.aimbot == true)
+		if (GetAsyncKeyState(VK_RBUTTON))
 		{
 			float target_dist = FLT_MAX;
 			EntityList target_entity = {};
@@ -100,37 +77,34 @@ auto CallAimbot()->VOID
 				auto Health = read<float>(Entity.actor_pawn + GameOffset.offset_health);
 				auto MaxHealth = read<float>(Entity.actor_pawn + GameOffset.offset_max_health);
 				auto Percentage = Health * 100 / MaxHealth;
-				if (!Entity.actor_mesh || !isVisible(Entity.actor_mesh)) continue;
-				if (cfg.Nodieaim) {if (Percentage == 0 || !Entity.actor_state || !Entity.actor_pawn){continue;}}
 				auto Playerstate = read<uintptr_t>(Entity.actor_pawn + GameOffset.offset_player_state);
 				uint64_t LAKSTeamState = read<uint64_t>(GameVars.local_player_state + GameOffset.r_Team);
 				uint64_t LTeamNum = read<uint64_t>(LAKSTeamState + GameOffset.r_TeamNum);
 				uint64_t AKSTeamState = read<uint64_t>(Playerstate + GameOffset.r_Team);
 				uint64_t TeamNum = read<uint64_t>(AKSTeamState + GameOffset.r_TeamNum);
-				if (LTeamNum == TeamNum){continue;}if (cfg.nodownaim == true)
-				{
-					auto knocked = read<uintptr_t>(Entity.actor_pawn + GameOffset.bDowned);
-					if (knocked == true){continue;}
-				}
-				auto head_pos = GetBoneWithRotation(Entity.actor_mesh, 110);
+				auto knocked = read<uintptr_t>(Entity.actor_pawn + GameOffset.bDowned);
+				auto head_pos = GetBoneWithRotation(Entity.actor_mesh, 112);
 				auto targethead = ProjectWorldToScreen(Vector3(head_pos.x, head_pos.y, head_pos.z));
 				float x = targethead.x - GameVars.ScreenWidth / 2.0f;
 				float y = targethead.y - GameVars.ScreenHeight / 2.0f;
 				float crosshair_dist = sqrtf((x * x) + (y * y));
+				if (!Entity.actor_mesh || !isVisible(Entity.actor_mesh) || (Percentage == 0 || !Entity.actor_state) || LTeamNum == TeamNum || knocked == true) continue;
 				if (crosshair_dist <= FLT_MAX && crosshair_dist <= target_dist)
 				{
-					if (crosshair_dist > cfg.AimbotFOV){continue;}
 					target_dist = crosshair_dist;
 					target_entity = Entity;
 				}
 			}
-				auto target = GetBoneWithRotation(target_entity.actor_mesh, 110);
+			if (target_entity.actor_mesh != 0)
+			{
+				auto target = GetBoneWithRotation(target_entity.actor_mesh, 112);
 				auto loc = ProjectWorldToScreen(Vector3(target.x, target.y, target.z));
 				move_to(loc.x, loc.y);
+			}
 		}
 	}
 }
-auto GameCache()->VOID
+auto GameCache()
 {
 	while (true)
 	{
@@ -157,8 +131,6 @@ auto GameCache()->VOID
 			EntityList Entity{ };
 			Entity.actor_pawn = actor_pawn;
 			Entity.actor_id = actor_id;
-			if (cfg.enemiesesp == true)
-			{
 				if (name == "MainCharacter_C" || name == "MainCharacter_Royale_C" || name == "DefaultPVPBotCharacter_C" || name == "DefaultBotCharacter_C")
 				{
 					if (actor_pawn != NULL || actor_id != NULL || actor_state != NULL || actor_mesh != NULL)
@@ -171,12 +143,11 @@ auto GameCache()->VOID
 						tmpList.push_back(Entity);
 					}
 				}
-			}
 		}
 		entityList = tmpList;
 	}
 }
-auto RenderVisual()->VOID
+auto RenderVisual()
 {
 	auto EntityList_Copy = entityList;
 	for (int index = 0; index < EntityList_Copy.size(); ++index)
@@ -185,113 +156,46 @@ auto RenderVisual()->VOID
 		auto Health = read<float>(Entity.actor_pawn + GameOffset.offset_health);
 		auto MaxHealth = read<float>(Entity.actor_pawn + GameOffset.offset_max_health);
 		auto Percentage = Health * 100 / MaxHealth;
-	//	if (Entity.actor_pawn == GameVars.local_player_pawn){continue;}
-			if (Percentage == 0 || !Entity.actor_mesh || !Entity.actor_state || !Entity.actor_pawn)
-			{
-				continue;
-			}
-			auto knocked = read<uintptr_t>(Entity.actor_pawn + GameOffset.bDowned);
-			if (knocked == true)
-			{
-				continue;
-			}
+		auto knocked = read<uintptr_t>(Entity.actor_pawn + GameOffset.bDowned);
 		auto Playerstate = read<uintptr_t>(Entity.actor_pawn + GameOffset.offset_player_state);
 		uint64_t LAKSTeamState = read<uint64_t>(GameVars.local_player_state + GameOffset.r_Team);
 		uint64_t LTeamNum = read<uint64_t>(LAKSTeamState + GameOffset.r_TeamNum);
 		uint64_t AKSTeamState = read<uint64_t>(Playerstate + GameOffset.r_Team);
 		uint64_t TeamNum = read<uint64_t>(AKSTeamState + GameOffset.r_TeamNum);
-		if (LTeamNum != TeamNum)
-		{
-		}
-		else {
-			if (cfg.friendsesp == false)
-			{
-				continue;
-			}
-		}
+		if (Percentage == 0 || !Entity.actor_mesh || !Entity.actor_state || !Entity.actor_pawn || knocked == true || LTeamNum == TeamNum){continue;}
 		auto local_pos = read<Vector3>(GameVars.local_player_root + GameOffset.offset_relative_location);
 		auto head_pos = GetBoneWithRotation(Entity.actor_mesh, 110);
 		auto bone_pos = GetBoneWithRotation(Entity.actor_mesh, 0);
 		auto BottomBox = ProjectWorldToScreen(bone_pos);
-		auto TopBox = ProjectWorldToScreen(Vector3(head_pos.x, head_pos.y, head_pos.z + 15));
+		auto TopBox = ProjectWorldToScreen(Vector3(head_pos.x, head_pos.y, head_pos.z));
 		auto entity_distance = local_pos.Distance(bone_pos);
 		auto CornerHeight = abs(TopBox.y - BottomBox.y);
 		auto CornerWidth = CornerHeight * 0.65;
 		auto bVisible = isVisible(Entity.actor_mesh);
 		auto ESP_Color = GetVisibleColor(bVisible);
-			write<float>(weaponasset() + GameOffset.PostFireTime, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.AltPostFireTime, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.PostFireForgivenessTime, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.InitialPostFireTime, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.FinalPostFireTime, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.PostFireChargeTime, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.PostFireDecayTime, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.PostFireDecayDelay, cfg.f_fastbulletsmelee);
-			write<float>(weaponasset() + GameOffset.PreReloadTime, 0.1f);
-			write<EReloadType>(weaponasset() + GameOffset.ReloadType, EReloadType::Clip);
-			write<EFireModeType>(weaponasset() + GameOffset.firemodetype, EFireModeType::SemiAuto);
-			write<float>(weaponasset() + GameOffset.NoSpread, 100.0f);
-			write<bool>(weaponasset() + GameOffset.bUnlimitedAmmo, true);
-			write<bool>(weaponasset() + GameOffset.bUnlimitedAmmo, false);
-			write<bool>(GameVars.local_player_controller + GameOffset.offset_bKickbackEnabled, false);
-			if (entity_distance < cfg.max_distance)
-			{
-						DrawCorneredBox(TopBox.x - (CornerWidth / 2), TopBox.y, CornerWidth, CornerHeight, ESP_Color, cfg.boxwidth);
-			
-						DrawLine(ImVec2(static_cast<float>(GameVars.ScreenWidth / 2), 0.f), ImVec2(TopBox.x, TopBox.y), ESP_Color, 1.5f); //LINE FROM TOP SCREEN
-				if (cfg.b_EspDistance)
-				{
-					char dist[64];
-					sprintf_s(dist, "D:%.fm", entity_distance);
-					DrawOutlinedText(Verdana, dist, ImVec2(BottomBox.x, BottomBox.y), 14.0f, ImColor(255, 255, 255), true);
-				}
-				if (cfg.healthbar)
-				{
-					auto Health = read<float>(Entity.actor_pawn + GameOffset.offset_health);
-					auto MaxHealth = read<float>(Entity.actor_pawn + GameOffset.offset_max_health);
-					float Percentage = Health * 100 / MaxHealth;
-					float width = CornerWidth / 10;
-					if (width < 2.f) width = 2.;
-					if (width > 3) width = 3.;
-					HealthBar(TopBox.x - (CornerWidth / 2) - 8, TopBox.y, width, BottomBox.y - TopBox.y, Percentage);
-				}
-				if (cfg.healthpercenet)
-				{
-					float Health = read<float>(Entity.actor_pawn + GameOffset.offset_health);
-					float MaxHealth = read<float>(Entity.actor_pawn + GameOffset.offset_max_health);
-					float Percentage = Health * 100 / MaxHealth;
-					if (Percentage <= 25)
-					{
-						char healthpercenet[64];
-						sprintf(healthpercenet, "H:%.f%%", Percentage);
-						DrawOutlinedText(Verdana, healthpercenet, ImVec2(TopBox.x, TopBox.y), 14.0f, ImColor(255, 38, 0), true);
-					}
-					if (Percentage <= 50 && Percentage >= 25)
-					{
-						char healthpercenet[64];
-						sprintf(healthpercenet, "H:%.f%%", Percentage);
-						DrawOutlinedText(Verdana, healthpercenet, ImVec2(TopBox.x, TopBox.y), 14.0f, ImColor(255, 77, 0), true);
-					}
-					if (Percentage <= 75 && Percentage >= 50)
-					{
-						char healthpercenet[64];
-						sprintf(healthpercenet, "H:%.f%%", Percentage);
-						DrawOutlinedText(Verdana, healthpercenet, ImVec2(TopBox.x, TopBox.y), 14.0f, ImColor(255, 200, 0), true);
-					}
-					if (Percentage <= 100 && Percentage >= 75)
-					{
-						char healthpercenet[64];
-						sprintf(healthpercenet, "H:%.f%%", Percentage);
-						DrawOutlinedText(Verdana, healthpercenet, ImVec2(TopBox.x, TopBox.y), 14.0f, ImColor(0, 255, 0, 255), true);
-					}
-				}
-				if (cfg.fullnameesp == true)
-				{
-					auto PlayerName = read<FString>(Entity.actor_state + GameOffset.offset_player_name);
-					DrawOutlinedText(Verdana, PlayerName.ToString(), ImVec2(TopBox.x, TopBox.y - 20), 14.0f, cfg.fullPlayerName, true);
-				}
+		write<float>(weaponasset() + GameOffset.PostFireTime, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.AltPostFireTime, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.PostFireForgivenessTime, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.InitialPostFireTime, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.FinalPostFireTime, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.PostFireChargeTime, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.PostFireDecayTime, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.PostFireDecayDelay, cfg.f_fastbulletsmelee);
+		write<float>(weaponasset() + GameOffset.PreReloadTime, 0.1f);
+		write<EReloadType>(weaponasset() + GameOffset.ReloadType, EReloadType::Clip);
+		write<EFireModeType>(weaponasset() + GameOffset.firemodetype, EFireModeType::SemiAuto);
+		write<float>(weaponasset() + GameOffset.NoSpread, 100.0f);
+		write<bool>(weaponasset() + GameOffset.bUnlimitedAmmo, true);
+		write<bool>(weaponasset() + GameOffset.bUnlimitedAmmo, false);
+		write<bool>(GameVars.local_player_controller + GameOffset.offset_bKickbackEnabled, false);
+		DrawCorneredBox(TopBox.x - (CornerWidth / 2), TopBox.y, CornerWidth, CornerHeight, ESP_Color, cfg.boxwidth);
+		DrawLine(ImVec2(static_cast<float>(GameVars.ScreenWidth / 2), 0.f), ImVec2(TopBox.x, TopBox.y), ESP_Color, 1.5f);
+		char dist[64];
+		sprintf_s(dist, "D:%.fm", entity_distance);
+		DrawOutlinedText(Verdana, dist, ImVec2(BottomBox.x, BottomBox.y), 14.0f, ImColor(255, 255, 255), true);
+		auto PlayerName = read<FString>(Entity.actor_state + GameOffset.offset_player_name);
+		DrawOutlinedText(Verdana, PlayerName.ToString(), ImVec2(TopBox.x, TopBox.y - 20), 14.0f, cfg.fullPlayerName, true);
 			}
-		}
 }
 void Render()
 {
@@ -350,12 +254,10 @@ void MainLoop() {
 		TempRect.top = TempPoint.y;
 		ImGuiIO& io = ImGui::GetIO();
 		io.ImeWindowHandle = GameVars.gameHWND;
-
 		POINT TempPoint2;
 		GetCursorPos(&TempPoint2);
 		io.MousePos.x = TempPoint2.x - TempPoint.x;
 		io.MousePos.y = TempPoint2.y - TempPoint.y;
-
 		if (GetAsyncKeyState(0x1)) {
 			io.MouseDown[0] = true;
 			io.MouseClicked[0] = true;
@@ -365,7 +267,6 @@ void MainLoop() {
 		else {
 			io.MouseDown[0] = false;
 		}
-
 		if (TempRect.left != OldRect.left || TempRect.right != OldRect.right || TempRect.top != OldRect.top || TempRect.bottom != OldRect.bottom) {
 			OldRect = TempRect;
 			GameVars.ScreenWidth = TempRect.right;
@@ -456,9 +357,9 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 }
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
-	rcdriv::init();
 	HANDLE handle = CreateMutex(NULL, TRUE, "TinyMan RC v1.5 lite");
-	if (GetLastError() != ERROR_SUCCESS){MessageBox(0, "Cheat is already running! press END to close it", "Information", MB_OK | MB_TOPMOST | MB_ICONINFORMATION);}
+	if (GetLastError() != ERROR_SUCCESS) { MessageBox(0, "Cheat is already running! press END to close it", "Information", MB_OK | MB_TOPMOST | MB_ICONINFORMATION); exit(0); }
+	rcdriv::init();
 	GameVars.dwProcessId = GetProcessId(GameVars.dwProcessName);
 	if (!GameVars.dwProcessId)
 	{
