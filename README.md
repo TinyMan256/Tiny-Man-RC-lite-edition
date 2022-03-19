@@ -2,7 +2,7 @@
 
 Rogue company external cheat [ Lite edition ] for low end pc
 
-updated to latest version and undetected again
+updated to latest version and undetected
 
 working on all windows versions
 
@@ -15,10 +15,8 @@ weapon type: auto
 fast reload  
 reload type: clip  
 fast bullets  
-unlimited ammo  
-fixed esp and aimbot enhanced  
-press end or close the game to unload the cheat  
-Run the cheat with administrator
+unlimited ammo   
+press end or close the game to unload the cheat
 
 Tiny Man#0200
 
