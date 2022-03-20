@@ -14,7 +14,7 @@ no recoil
 weapon type: auto  
 fast reload  
 reload type: clip  
-fast bullets  
+fast bullets/melee  
 unlimited ammo   
 press end or close the game to unload the cheat
 
