@@ -17,6 +17,7 @@ updated to latest version and undetected
 working on all windows versions
 
 features:  
+no-menu
 esp  
 aimbot  
 no spread  
