@@ -1,5 +1,7 @@
 # Tiny-Man-RC-lite-edition
 
+Join Discord server if you want free skin changer cheat or need any support  
+Unknown Cheaters Discord server: https://discord.gg/MKxrtessSF
 ```yaml
 - Important🟢
 ```
@@ -29,7 +31,4 @@ fast bullets/melee
 unlimited ammo   
 press end or close the game to unload the cheat
 
-Tiny Man#0200
-
-Join Discord server if you want free skin changer cheat or need any support  
-Unknown Cheaters Discord server: https://discord.gg/MKxrtessSF
+my Discord: Tiny Man#0200
