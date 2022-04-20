@@ -1,6 +1,6 @@
 # Tiny-Man-RC-lite-edition
 
-Join Discord server if you want free skin changer cheat or need any support  
+Join Discord server if you want updated version of the cheat / every update will be there  
 Unknown Cheaters Discord server: https://discord.gg/MKxrtessSF
 ```yaml
 - Important🟢
