@@ -1,7 +1,7 @@
 # Tiny-Man-RC-lite-edition
 
 Join Discord server if you want updated version of the cheat / every update will be there  
-Unknown Cheaters Discord server: https://discord.gg/MKxrtessSF
+Unknown Cheaters Discord server: https://discord.gg/bzdjT2W84n
 ```yaml
 - Important🟢
 ```
