@@ -131,4 +131,7 @@ inline namespace RogueCompany
 		DWORD DamageTypeClass = 0x578; //UKSWeaponAsset -> DamageTypeClass //ok
 	};
 #define GameOffset RogueCompany::Offsets::Get()
+	uintptr_t GNames = 0x6c7f180;
+	uintptr_t GObjects = 0x6cab3f8;
+	uintptr_t GWorld = 0x6dee1b8;
 }
